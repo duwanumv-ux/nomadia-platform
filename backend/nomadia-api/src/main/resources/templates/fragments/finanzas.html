@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Tarjeta del estado financiero (Ley de Rigidez Financiera).
+  Parámetro: finanzas (EstadoFinanciero). Semáforo: normal < 85 % ≤ alerta < 100 % = agotado.
+-->
+<section th:fragment="resumen(finanzas)" class="tarjeta"
+         th:classappend="'nivel-' + ${#strings.toLowerCase(finanzas.nivel.name())}">
+    <div class="cabecera-viaje">
+        <strong>Ley de Rigidez Financiera</strong>
+        <span th:text="${finanzas.porcentajeEjecucion} + ' % ejecutado'">72 % ejecutado</span>
+    </div>
+    <div class="presupuesto-barra" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+         th:attr="aria-valuenow=${finanzas.porcentajeEjecucion}">
+        <span th:style="'width:' + ${finanzas.porcentajeEjecucion} + '%'"></span>
+    </div>
+    <div class="cifras">
+        <div><small>Presupuesto</small><strong th:text="${@formato.moneda(finanzas.presupuesto, finanzas.moneda)}">$ 2.500.000 COP</strong></div>
+        <div><small>Ejecutado</small><strong th:text="${@formato.moneda(finanzas.ejecutado, finanzas.moneda)}">$ 1.645.000 COP</strong></div>
+        <div><small>Saldo</small><strong th:text="${@formato.moneda(finanzas.saldo, finanzas.moneda)}">$ 855.000 COP</strong></div>
+    </div>
+    <p th:if="${finanzas.nivel.name() == 'ALERTA'}" class="aviso aviso-alerta">
+        <i class="ph ph-warning"></i>Has usado más del 85 % del presupuesto. Modera los próximos gastos.
+    </p>
+    <p th:if="${finanzas.nivel.name() == 'AGOTADO'}" class="aviso aviso-error">
+        <i class="ph ph-prohibit"></i>Presupuesto agotado: NomadIA bloqueará cualquier gasto adicional.
+    </p>
+</section>
+</body>
+</html>

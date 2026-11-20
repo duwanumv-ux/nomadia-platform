@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Pantalla 1 del prototipo: Inicio. El formulario rápido envía por GET a /viajes/nuevo. -->
+<head th:replace="~{fragments/layout :: head('Inicio')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado(null)}"></header>
+
+    <h1 class="titulo-principal">Tu próximo destino está más cerca de lo que imaginas</h1>
+    <p class="subtitulo centro">Descubre, planea y vive experiencias únicas con la ayuda de la inteligencia artificial.</p>
+
+    <form class="tarjeta" th:action="@{/viajes/nuevo}" method="get" th:object="${viajeForm}">
+        <div class="campo">
+            <label for="destinoId">¿A dónde quieres viajar?</label>
+            <div class="control">
+                <i class="ph ph-map-pin"></i>
+                <select id="destinoId" th:field="*{destinoId}">
+                    <option value="">Selecciona un destino</option>
+                    <option th:each="destino : ${destinos}" th:value="${destino.id}"
+                            th:text="${destino.etiqueta}">Cartagena</option>
+                </select>
+            </div>
+        </div>
+        <div class="campo">
+            <label for="fechaInicio">Fecha de inicio</label>
+            <div class="control">
+                <i class="ph ph-calendar-blank"></i>
+                <input type="date" id="fechaInicio" th:field="*{fechaInicio}">
+            </div>
+        </div>
+        <div class="campo">
+            <label for="fechaFin">Fecha de regreso</label>
+            <div class="control">
+                <i class="ph ph-calendar-check"></i>
+                <input type="date" id="fechaFin" th:field="*{fechaFin}">
+            </div>
+        </div>
+        <div class="campo">
+            <label for="presupuesto">Presupuesto aproximado</label>
+            <div class="control">
+                <i class="ph ph-currency-circle-dollar"></i>
+                <input type="number" id="presupuesto" th:field="*{presupuesto}" min="1" step="1000"
+                       placeholder="2000000">
+            </div>
+        </div>
+        <button type="submit" class="boton boton-primario">Planificar viaje <i class="ph ph-arrow-right"></i></button>
+    </form>
+
+    <section th:if="${!viajesRecientes.isEmpty()}">
+        <h2 class="seccion-titulo">Tus planes recientes</h2>
+        <a th:each="viaje : ${viajesRecientes}" th:href="@{/viajes/{id}(id=${viaje.id})}" class="tarjeta tarjeta-viaje">
+            <div class="cabecera-viaje">
+                <h3 th:text="${viaje.destino.ciudad}">Cartagena</h3>
+                <span class="etiqueta" th:classappend="'etiqueta-' + ${viaje.estado.codigo}"
+                      th:text="${viaje.estado.etiqueta}">Activo</span>
+            </div>
+            <small th:text="${#temporals.format(viaje.fechaInicio, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(viaje.fechaFin, 'dd/MM/yyyy')}">15/10/2026 – 20/10/2026</small>
+        </a>
+    </section>
+
+    <nav th:replace="~{fragments/layout :: navegacion('inicio')}"></nav>
+</main>
+</body>
+</html>

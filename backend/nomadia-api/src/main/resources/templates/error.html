@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Página de error común (404, 400, 500). La usan WebExceptionHandler y Spring Boot. -->
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado('/')}"></header>
+    <section class="pagina-error">
+        <p class="codigo" th:text="${status}">404</p>
+        <h1 class="titulo">Algo no salió como esperábamos</h1>
+        <p class="subtitulo" th:text="${mensaje != null ? mensaje : 'La página solicitada no está disponible.'}">
+            La página solicitada no está disponible.</p>
+        <a th:href="@{/}" class="boton boton-primario">Volver al inicio</a>
+    </section>
+    <nav th:replace="~{fragments/layout :: navegacion('inicio')}"></nav>
+</main>
+</body>
+</html>

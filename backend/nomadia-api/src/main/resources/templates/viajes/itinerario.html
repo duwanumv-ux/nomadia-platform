@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Pantalla 5 del prototipo: "Tu itinerario". Un bloque por día con sus actividades (HU-05). -->
+<head th:replace="~{fragments/layout :: head('Tu itinerario')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado(|/viajes/${viaje.id}|)}"></header>
+    <div th:replace="~{fragments/layout :: mensaje}"></div>
+
+    <h1 class="titulo">Tu itinerario</h1>
+    <p class="subtitulo">
+        <span th:text="${viaje.destino.ciudad} + ' · ' + ${viaje.duracionDias} + ' días'">Cartagena · 3 días</span><br>
+        <span th:text="'Costo estimado de actividades: ' + ${@formato.moneda(costoPlaneado, viaje.moneda)}">Costo</span>
+    </p>
+
+    <section th:each="dia : ${dias}" class="tarjeta" th:with="actividades=${actividadesPorDia.get(dia.id)}">
+        <div class="dia-cabecera">
+            <span class="dia-numero" th:text="'Día ' + ${dia.orden}">Día 1</span>
+            <span class="dia-fecha" th:text="${#temporals.format(dia.fecha, 'dd/MM/yyyy')}">15/10/2026</span>
+        </div>
+
+        <ul class="actividades" th:if="${actividades != null}">
+            <li th:each="actividad : ${actividades}">
+                <div class="actividad-linea">
+                    <span>
+                        <span th:text="${actividad.nombre}">Llegada a Cartagena</span>
+                        <small th:if="${actividad.costo.signum() > 0}"
+                               th:text="' · ' + ${@formato.moneda(actividad.costo, viaje.moneda)}"> · $ 45.000 COP</small>
+                    </span>
+                    <form th:action="@{/viajes/{v}/actividades/{a}/eliminar(v=${viaje.id}, a=${actividad.id})}" method="post"
+                          onsubmit="return confirm('¿Eliminar esta actividad?');">
+                        <button type="submit" class="boton-icono" aria-label="Eliminar actividad"><i class="ph ph-x"></i></button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+        <p th:if="${actividades == null}" class="sin-actividades">Aún no hay actividades para este día.</p>
+
+        <!-- Formulario para agregar actividades; se abre solo si este día tuvo un error de validación -->
+        <details class="agregar" th:open="${diaConError == dia.id}">
+            <summary><i class="ph ph-plus"></i> Agregar actividad</summary>
+            <form th:action="@{/viajes/{v}/itinerario/{d}/actividades(v=${viaje.id}, d=${dia.id})}"
+                  th:object="${actividadForm}" method="post" novalidate>
+                <th:block th:with="hasErrores=${diaConError == dia.id}">
+                    <div class="campo">
+                        <label th:for="'nombre-' + ${dia.id}">Actividad</label>
+                        <div class="control" th:classappend="${hasErrores and #fields.hasErrors('nombre')} ? 'con-error'">
+                            <i class="ph ph-star"></i>
+                            <input type="text" th:id="'nombre-' + ${dia.id}" name="nombre" maxlength="120"
+                                   th:value="${hasErrores} ? *{nombre} : ''" placeholder="Ej.: Playa Blanca">
+                        </div>
+                        <small class="error-campo" th:if="${hasErrores and #fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                    </div>
+                    <div class="campo">
+                        <label th:for="'costo-' + ${dia.id}">Costo estimado (opcional)</label>
+                        <div class="control" th:classappend="${hasErrores and #fields.hasErrors('costo')} ? 'con-error'">
+                            <i class="ph ph-currency-circle-dollar"></i>
+                            <input type="number" th:id="'costo-' + ${dia.id}" name="costo" min="0" step="0.01"
+                                   th:value="${hasErrores} ? *{costo} : ''" placeholder="0">
+                        </div>
+                        <small class="error-campo" th:if="${hasErrores and #fields.hasErrors('costo')}" th:errors="*{costo}"></small>
+                    </div>
+                    <button type="submit" class="boton boton-primario boton-pequeno">Agregar</button>
+                </th:block>
+            </form>
+        </details>
+    </section>
+
+    <a th:href="@{/viajes/{id}/gastos(id=${viaje.id})}" class="boton boton-secundario"><i class="ph ph-wallet"></i> Gastos del viaje</a>
+    <a th:href="@{/}" class="boton boton-secundario">Volver al inicio</a>
+
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+</body>
+</html>
