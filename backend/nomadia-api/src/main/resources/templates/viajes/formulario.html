@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Pantalla 2 del prototipo: "Planifica tu viaje".
+  La misma plantilla sirve para crear (viajeId = null) y para editar (viajeId con valor).
+-->
+<head th:replace="~{fragments/layout :: head(${viajeId == null ? 'Planifica tu viaje' : 'Editar viaje'})}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado(${viajeId == null ? '/' : '/viajes/' + viajeId})}"></header>
+
+    <h1 class="titulo" th:text="${viajeId == null ? 'Planifica tu viaje' : 'Editar viaje'}">Planifica tu viaje</h1>
+    <p class="subtitulo" th:if="${viajeId == null}">Completa la información y deja que la IA haga la magia.</p>
+    <p class="subtitulo" th:if="${viajeId != null}">Actualiza los datos de tu plan. El presupuesto no puede quedar por debajo de lo ya gastado.</p>
+
+    <form th:action="${viajeId == null} ? @{/viajes} : @{/viajes/{id}(id=${viajeId})}" th:object="${viajeForm}"
+          method="post" novalidate>
+
+        <div th:if="${#fields.hasGlobalErrors()}" class="aviso aviso-error">
+            <i class="ph ph-warning-circle"></i>
+            <span th:each="error : ${#fields.globalErrors()}" th:text="${error}">Error general</span>
+        </div>
+
+        <div class="campo">
+            <label for="usuarioId">Viajero</label>
+            <div class="control" th:classappend="${#fields.hasErrors('usuarioId')} ? 'con-error'">
+                <i class="ph ph-user"></i>
+                <select id="usuarioId" th:field="*{usuarioId}">
+                    <option value="">Selecciona el viajero</option>
+                    <option th:each="usuario : ${usuarios}" th:value="${usuario.id}"
+                            th:text="${usuario.nombreCompleto}">Ana María Ríos</option>
+                </select>
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('usuarioId')}" th:errors="*{usuarioId}"></small>
+        </div>
+
+        <div class="campo">
+            <label for="destinoId">Destino</label>
+            <div class="control" th:classappend="${#fields.hasErrors('destinoId')} ? 'con-error'">
+                <i class="ph ph-map-pin"></i>
+                <select id="destinoId" th:field="*{destinoId}">
+                    <option value="">Selecciona un destino</option>
+                    <option th:each="destino : ${destinos}" th:value="${destino.id}"
+                            th:text="${destino.etiqueta}">Cartagena</option>
+                </select>
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('destinoId')}" th:errors="*{destinoId}"></small>
+        </div>
+
+        <div class="campo">
+            <label for="fechaInicio">Fecha de inicio</label>
+            <div class="control" th:classappend="${#fields.hasErrors('fechaInicio')} ? 'con-error'">
+                <i class="ph ph-calendar-blank"></i>
+                <input type="date" id="fechaInicio" th:field="*{fechaInicio}">
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}"></small>
+        </div>
+
+        <div class="campo">
+            <label for="fechaFin">Fecha de regreso</label>
+            <div class="control" th:classappend="${#fields.hasErrors('fechaFin')} ? 'con-error'">
+                <i class="ph ph-calendar-check"></i>
+                <input type="date" id="fechaFin" th:field="*{fechaFin}">
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('fechaFin')}" th:errors="*{fechaFin}"></small>
+        </div>
+
+        <div class="campo">
+            <label for="presupuesto">Presupuesto aproximado</label>
+            <div class="control" th:classappend="${#fields.hasErrors('presupuesto')} ? 'con-error'">
+                <i class="ph ph-currency-circle-dollar"></i>
+                <input type="number" id="presupuesto" th:field="*{presupuesto}" min="1" step="0.01" placeholder="2000000">
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('presupuesto')}" th:errors="*{presupuesto}"></small>
+        </div>
+
+        <div class="campo">
+            <label>Moneda</label>
+            <div class="opciones">
+                <label class="opcion" th:each="opcionMoneda : ${monedas}">
+                    <input type="radio" th:field="*{moneda}" th:value="${opcionMoneda}">
+                    <span th:text="${opcionMoneda.name()}" th:title="${opcionMoneda.descripcion}">COP</span>
+                </label>
+            </div>
+            <small class="error-campo" th:if="${#fields.hasErrors('moneda')}" th:errors="*{moneda}"></small>
+        </div>
+
+        <div class="campo" th:if="${viajeId != null}">
+            <label for="estado">Estado del viaje</label>
+            <div class="control">
+                <i class="ph ph-flag"></i>
+                <select id="estado" th:field="*{estado}">
+                    <option th:each="opcionEstado : ${estados}" th:value="${opcionEstado}"
+                            th:text="${opcionEstado.etiqueta}">Activo</option>
+                </select>
+            </div>
+            <p class="nota"><i class="ph ph-info"></i>Si cambias las fechas, el itinerario se genera de nuevo y se borran sus actividades.</p>
+        </div>
+
+        <button type="submit" class="boton boton-primario">
+            <span th:text="${viajeId == null ? 'Generar plan' : 'Guardar cambios'}">Generar plan</span>
+            <i class="ph ph-arrow-right"></i>
+        </button>
+    </form>
+
+    <nav th:replace="~{fragments/layout :: navegacion('nuevo')}"></nav>
+</main>
+</body>
+</html>

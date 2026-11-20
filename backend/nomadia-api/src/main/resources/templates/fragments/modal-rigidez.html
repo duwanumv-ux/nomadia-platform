@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Modal interceptor de la Ley de Rigidez Financiera (el mismo "modal-overlay" del front-end).
+  Parámetros: rigidez (PresupuestoExcedidoException) y moneda del viaje.
+-->
+<div th:fragment="modal(rigidez, moneda)" class="modal-fondo" id="modal-rigidez" role="alertdialog"
+     aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal">
+        <div class="icono-peligro"><i class="ph ph-shield-warning"></i></div>
+        <h2 id="modal-titulo">Gasto bloqueado</h2>
+        <p>La Ley de Rigidez Financiera impide registrar este gasto porque supera el saldo disponible del viaje.</p>
+        <div class="cifras" style="margin-bottom:16px">
+            <div><small>Gasto propuesto</small><strong th:text="${@formato.moneda(rigidez.montoPropuesto, moneda)}">$ 300.000 COP</strong></div>
+            <div><small>Saldo disponible</small><strong th:text="${@formato.moneda(rigidez.saldoDisponible, moneda)}">$ 150.000 COP</strong></div>
+            <div><small>Exceso</small><strong th:text="${@formato.moneda(rigidez.montoPropuesto.subtract(rigidez.saldoDisponible), moneda)}">$ 150.000 COP</strong></div>
+        </div>
+        <button type="button" class="boton boton-primario" data-cerrar-modal>Entendido, ajustaré el gasto</button>
+    </div>
+</div>
+</body>
+</html>

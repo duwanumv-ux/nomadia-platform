@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- "Mis planes": consulta de viajes con filtro por estado (HU-02). -->
+<head th:replace="~{fragments/layout :: head('Mis planes')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado('/')}"></header>
+    <div th:replace="~{fragments/layout :: mensaje}"></div>
+
+    <h1 class="titulo">Mis planes</h1>
+    <p class="subtitulo" th:text="${viajes.size()} + ' viaje(s) encontrados'">3 viajes encontrados</p>
+
+    <nav class="filtros" aria-label="Filtrar por estado">
+        <a th:href="@{/viajes}" class="filtro" th:classappend="${estadoFiltro == null} ? 'activo'">Todos</a>
+        <a th:each="opcionEstado : ${estados}" th:href="@{/viajes(estado=${opcionEstado})}" class="filtro"
+           th:classappend="${estadoFiltro == opcionEstado} ? 'activo'" th:text="${opcionEstado.etiqueta}">Activo</a>
+    </nav>
+
+    <div th:if="${viajes.isEmpty()}" class="tarjeta centro">
+        <p>No hay viajes con este filtro.</p>
+        <a th:href="@{/viajes/nuevo}" class="boton boton-primario">Planificar un viaje</a>
+    </div>
+
+    <a th:each="viaje : ${viajes}" th:href="@{/viajes/{id}(id=${viaje.id})}" class="tarjeta tarjeta-viaje"
+       th:with="estadoFinanciero=${finanzas.get(viaje.id)}"
+       th:classappend="'nivel-' + ${#strings.toLowerCase(estadoFinanciero.nivel.name())}">
+        <div class="cabecera-viaje">
+            <h3 th:text="${viaje.destino.ciudad}">Cartagena</h3>
+            <span class="etiqueta" th:classappend="'etiqueta-' + ${viaje.estado.codigo}" th:text="${viaje.estado.etiqueta}">Activo</span>
+        </div>
+        <small th:text="${viaje.usuario.nombreCompleto} + ' · ' + ${#temporals.format(viaje.fechaInicio, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(viaje.fechaFin, 'dd/MM/yyyy')}">Ana · 15/10/2026 – 20/10/2026</small>
+        <div class="presupuesto-barra"><span th:style="'width:' + ${estadoFinanciero.porcentajeEjecucion} + '%'"></span></div>
+        <small th:text="${estadoFinanciero.porcentajeEjecucion} + ' % de ' + ${@formato.moneda(viaje.presupuesto, viaje.moneda)}">65 % de $ 2.500.000 COP</small>
+    </a>
+
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+</body>
+</html>

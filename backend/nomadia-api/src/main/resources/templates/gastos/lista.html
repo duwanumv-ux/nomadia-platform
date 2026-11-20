@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Control de gastos del viaje: registrar (HU-06), consultar y eliminar (HU-08). -->
+<head th:replace="~{fragments/layout :: head('Gastos del viaje')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado(|/viajes/${viaje.id}|)}"></header>
+    <div th:replace="~{fragments/layout :: mensaje}"></div>
+
+    <h1 class="titulo">Gastos del viaje</h1>
+    <p class="subtitulo" th:text="${viaje.destino.ciudad} + ' · ' + ${#temporals.format(viaje.fechaInicio, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(viaje.fechaFin, 'dd/MM/yyyy')}">Cartagena</p>
+
+    <section th:replace="~{fragments/finanzas :: resumen(${finanzas})}"></section>
+
+    <section class="tarjeta">
+        <h2 class="seccion-titulo" style="margin-top:0">Registrar gasto</h2>
+        <p th:unless="${viaje.activo}" class="aviso aviso-alerta"><i class="ph ph-lock"></i>
+            <span th:text="'Este viaje está ' + ${#strings.toLowerCase(viaje.estado.etiqueta)} + ': no admite gastos nuevos.'">Viaje cerrado</span></p>
+        <form th:if="${viaje.activo}" th:action="@{/viajes/{id}/gastos(id=${viaje.id})}" th:object="${gastoForm}"
+              method="post" novalidate>
+            <div th:replace="~{gastos/formulario :: campos}"></div>
+            <button type="submit" class="boton boton-primario"><i class="ph ph-plus"></i> Registrar gasto</button>
+        </form>
+    </section>
+
+    <section class="tarjeta">
+        <h2 class="seccion-titulo" style="margin-top:0" th:text="'Gastos registrados (' + ${gastos.size()} + ')'">Gastos registrados</h2>
+        <p th:if="${gastos.isEmpty()}" class="sin-actividades">Todavía no hay gastos en este viaje.</p>
+        <ul class="lista-plana">
+            <li th:each="gasto : ${gastos}" class="item-gasto">
+                <div>
+                    <strong th:text="${gasto.concepto}">Hotel</strong>
+                    <small th:text="${gasto.categoria.etiqueta} + ' · ' + ${#temporals.format(gasto.fecha, 'dd/MM/yyyy')}">Alojamiento · 15/10/2026</small>
+                </div>
+                <div class="acciones-fila" style="align-items:center">
+                    <span class="monto" th:text="${@formato.moneda(gasto.monto, viaje.moneda)}">$ 1.200.000 COP</span>
+                    <a th:href="@{/gastos/{id}/editar(id=${gasto.id})}" class="boton-icono" aria-label="Editar gasto"><i class="ph ph-pencil-simple"></i></a>
+                    <form th:action="@{/gastos/{id}/eliminar(id=${gasto.id})}" method="post"
+                          onsubmit="return confirm('¿Eliminar este gasto?');">
+                        <button type="submit" class="boton-icono" aria-label="Eliminar gasto"><i class="ph ph-trash"></i></button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <a th:href="@{/viajes/{id}(id=${viaje.id})}" class="boton boton-secundario">Volver al resumen</a>
+
+    <th:block th:if="${rigidez != null}"><div th:replace="~{fragments/modal-rigidez :: modal(${rigidez}, ${viaje.moneda})}"></div></th:block>
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+<script th:src="@{/js/modal.js}" src="../../static/js/modal.js"></script>
+</body>
+</html>

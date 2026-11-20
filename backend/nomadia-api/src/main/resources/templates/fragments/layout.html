@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Fragmentos reutilizables de NomadIA (patrón de composición de Thymeleaf):
+  head(titulo), encabezado(volver), navegacion(activo) y mensaje.
+-->
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' · NomadIA'">NomadIA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" th:href="@{/css/nomadia.css}" href="../../static/css/nomadia.css">
+    <link rel="icon" th:href="@{/img/logo.svg}" type="image/svg+xml">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+</head>
+<body>
+
+<!-- Encabezado con flecha de regreso opcional, logo y acceso a "Mis planes" -->
+<header class="encabezado" th:fragment="encabezado(volver)">
+    <a th:if="${volver != null}" th:href="@{${volver}}" class="icono-boton" aria-label="Volver">
+        <i class="ph ph-caret-left"></i>
+    </a>
+    <span th:unless="${volver != null}" class="icono-boton espaciador"></span>
+    <a th:href="@{/}" class="marca" aria-label="Ir al inicio">
+        <img th:src="@{/img/logo.svg}" src="../../static/img/logo.svg" alt="" width="40" height="40">
+        <span class="marca-texto">
+            <strong>Nomad<em>IA</em></strong>
+            <small>Planificador de viajes con IA</small>
+        </span>
+    </a>
+    <a th:href="@{/viajes}" class="icono-boton" aria-label="Mis planes"><i class="ph ph-list"></i></a>
+</header>
+
+<!-- Mensaje de confirmación según el parámetro ?msg= de la redirección -->
+<div th:fragment="mensaje" th:with="codigo=${param.msg != null ? param.msg[0] : null}">
+    <div th:if="${codigo != null}" class="aviso aviso-exito" role="status">
+        <i class="ph ph-check-circle"></i>
+        <span th:switch="${codigo}">
+            <span th:case="'actualizado'">Cambios guardados correctamente.</span>
+            <span th:case="'eliminado'">Registro eliminado.</span>
+            <span th:case="'registrado'">Gasto registrado dentro del presupuesto.</span>
+            <span th:case="'actividad'">Actividad agregada al itinerario.</span>
+            <span th:case="'actividad-eliminada'">Actividad eliminada del itinerario.</span>
+            <span th:case="*">Operación realizada.</span>
+        </span>
+    </div>
+</div>
+
+<!-- Barra de navegación inferior (Inicio, Planes, Nuevo) como en el prototipo -->
+<nav class="navegacion" th:fragment="navegacion(activo)">
+    <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'activo'">
+        <i class="ph ph-house"></i><span>Inicio</span>
+    </a>
+    <a th:href="@{/viajes}" th:classappend="${activo == 'planes'} ? 'activo'">
+        <i class="ph ph-calendar-blank"></i><span>Planes</span>
+    </a>
+    <a th:href="@{/viajes/nuevo}" th:classappend="${activo == 'nuevo'} ? 'activo'">
+        <i class="ph ph-plus-circle"></i><span>Nuevo</span>
+    </a>
+</nav>
+
+</body>
+</html>

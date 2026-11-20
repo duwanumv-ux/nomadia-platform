@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Pantalla 3 del prototipo: "Creando tu plan de viaje...". Redirige sola al resumen. -->
+<head th:replace="~{fragments/layout :: head('Creando tu plan')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado('/viajes')}"></header>
+
+    <section class="procesando" id="procesando" th:attr="data-destino=@{/viajes/{id}(id=${viaje.id}, nuevo=true)}">
+        <div class="spinner" aria-hidden="true"></div>
+        <h1 class="titulo">Creando tu plan de viaje...</h1>
+        <p class="subtitulo">NomadIA está organizando el itinerario de
+            <strong th:text="${viaje.duracionDias} + ' días'">5 días</strong> en
+            <strong th:text="${viaje.destino.ciudad}">Cartagena</strong>.</p>
+        <a th:href="@{/viajes}" class="boton boton-secundario">Cancelar</a>
+    </section>
+
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+<script th:src="@{/js/procesando.js}" src="../../static/js/procesando.js"></script>
+</body>
+</html>

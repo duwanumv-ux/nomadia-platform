@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Pantalla 4 del prototipo: "¡Tu viaje está listo!" (resumen del viaje y su estado financiero). -->
+<head th:replace="~{fragments/layout :: head('Resumen del viaje')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado('/viajes')}"></header>
+    <div th:replace="~{fragments/layout :: mensaje}"></div>
+
+    <div class="icono-exito"><i class="ph ph-check"></i></div>
+    <h1 class="titulo centro" th:text="${param.nuevo != null ? '¡Tu viaje está listo!' : 'Resumen de tu viaje'}">¡Tu viaje está listo!</h1>
+    <p class="subtitulo centro">Aquí tienes el resumen de tu aventura.</p>
+
+    <section class="tarjeta">
+        <div class="fila-dato">
+            <i class="ph ph-map-pin"></i>
+            <div><small>Destino</small>
+                <strong th:text="${viaje.destino.etiqueta}">Cartagena · Centro Histórico</strong></div>
+        </div>
+        <div class="fila-dato">
+            <i class="ph ph-calendar-blank"></i>
+            <div><small>Fechas</small>
+                <strong th:text="${#temporals.format(viaje.fechaInicio, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(viaje.fechaFin, 'dd/MM/yyyy')}">15/10/2026 - 20/10/2026</strong>
+                <small th:text="${viaje.duracionDias} + ' días'">6 días</small></div>
+        </div>
+        <div class="fila-dato">
+            <i class="ph ph-currency-circle-dollar"></i>
+            <div><small>Presupuesto</small>
+                <strong th:text="${@formato.moneda(viaje.presupuesto, viaje.moneda)}">$ 2.000.000 COP</strong></div>
+        </div>
+        <div class="fila-dato">
+            <i class="ph ph-user"></i>
+            <div><small>Viajero</small><strong th:text="${viaje.usuario.nombreCompleto}">Ana María Ríos</strong></div>
+        </div>
+        <div class="fila-dato">
+            <i class="ph ph-flag"></i>
+            <div><small>Estado</small>
+                <span class="etiqueta" th:classappend="'etiqueta-' + ${viaje.estado.codigo}" th:text="${viaje.estado.etiqueta}">Activo</span></div>
+        </div>
+    </section>
+
+    <section th:replace="~{fragments/finanzas :: resumen(${finanzas})}"></section>
+    <p class="nota"><i class="ph ph-info"></i>
+        <span th:text="'Costo estimado de las actividades del itinerario: ' + ${@formato.moneda(costoPlaneado, viaje.moneda)}">Costo estimado</span>
+    </p>
+
+    <a th:href="@{/viajes/{id}/itinerario(id=${viaje.id})}" class="boton boton-primario">Ver itinerario <i class="ph ph-arrow-right"></i></a>
+    <a th:href="@{/viajes/{id}/gastos(id=${viaje.id})}" class="boton boton-secundario"><i class="ph ph-wallet"></i> Gastos del viaje</a>
+    <div class="acciones-fila acciones-dos">
+        <a th:href="@{/viajes/{id}/editar(id=${viaje.id})}" class="boton boton-secundario"><i class="ph ph-pencil-simple"></i> Editar</a>
+        <form th:action="@{/viajes/{id}/eliminar(id=${viaje.id})}" method="post"
+              onsubmit="return confirm('¿Eliminar este viaje con su itinerario y sus gastos?');">
+            <button type="submit" class="boton boton-peligro"><i class="ph ph-trash"></i> Eliminar</button>
+        </form>
+    </div>
+    <a th:href="@{/}" class="boton boton-secundario">Volver al inicio</a>
+
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+</body>
+</html>

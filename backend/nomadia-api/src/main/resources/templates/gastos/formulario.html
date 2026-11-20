@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Edición de un gasto (HU-07). El fragmento "campos" también lo usa gastos/lista.html
+  para no duplicar el formulario (principio DRY).
+-->
+<head th:replace="~{fragments/layout :: head('Editar gasto')}"></head>
+<body>
+<main class="app">
+    <header th:replace="~{fragments/layout :: encabezado(|/viajes/${gasto.viaje.id}/gastos|)}"></header>
+
+    <h1 class="titulo">Editar gasto</h1>
+    <p class="subtitulo" th:text="${gasto.viaje.destino.ciudad} + ' · presupuesto ' + ${@formato.moneda(gasto.viaje.presupuesto, gasto.viaje.moneda)}">Cartagena</p>
+
+    <form class="tarjeta" th:action="@{/gastos/{id}(id=${gasto.id})}" th:object="${gastoForm}" method="post" novalidate>
+        <th:block th:fragment="campos">
+            <div th:if="${#fields.hasGlobalErrors()}" class="aviso aviso-error">
+                <i class="ph ph-warning-circle"></i>
+                <span th:each="error : ${#fields.globalErrors()}" th:text="${error}">Error general</span>
+            </div>
+            <div class="campo">
+                <label for="concepto">Concepto</label>
+                <div class="control" th:classappend="${#fields.hasErrors('concepto')} ? 'con-error'">
+                    <i class="ph ph-receipt"></i>
+                    <input type="text" id="concepto" th:field="*{concepto}" maxlength="150" placeholder="Ej.: Almuerzo típico">
+                </div>
+                <small class="error-campo" th:if="${#fields.hasErrors('concepto')}" th:errors="*{concepto}"></small>
+            </div>
+            <div class="campo">
+                <label for="monto">Monto</label>
+                <div class="control" th:classappend="${#fields.hasErrors('monto')} ? 'con-error'">
+                    <i class="ph ph-currency-circle-dollar"></i>
+                    <input type="number" id="monto" th:field="*{monto}" min="0.01" step="0.01" placeholder="50000">
+                </div>
+                <small class="error-campo" th:if="${#fields.hasErrors('monto')}" th:errors="*{monto}"></small>
+            </div>
+            <div class="campo">
+                <label for="fecha">Fecha</label>
+                <div class="control" th:classappend="${#fields.hasErrors('fecha')} ? 'con-error'">
+                    <i class="ph ph-calendar-blank"></i>
+                    <input type="date" id="fecha" th:field="*{fecha}">
+                </div>
+                <small class="error-campo" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></small>
+            </div>
+            <div class="campo">
+                <label for="categoria">Categoría</label>
+                <div class="control" th:classappend="${#fields.hasErrors('categoria')} ? 'con-error'">
+                    <i class="ph ph-tag"></i>
+                    <select id="categoria" th:field="*{categoria}">
+                        <option th:each="opcionCategoria : ${categorias}" th:value="${opcionCategoria}"
+                                th:text="${opcionCategoria.etiqueta}">General</option>
+                    </select>
+                </div>
+                <small class="error-campo" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></small>
+            </div>
+        </th:block>
+        <button type="submit" class="boton boton-primario">Guardar cambios</button>
+        <a th:href="@{/viajes/{id}/gastos(id=${gasto.viaje.id})}" class="boton boton-secundario">Cancelar</a>
+    </form>
+
+    <th:block th:if="${rigidez != null}"><div th:replace="~{fragments/modal-rigidez :: modal(${rigidez}, ${gasto.viaje.moneda})}"></div></th:block>
+    <nav th:replace="~{fragments/layout :: navegacion('planes')}"></nav>
+</main>
+<script th:src="@{/js/modal.js}" src="../../static/js/modal.js"></script>
+</body>
+</html>
