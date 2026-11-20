@@ -1,0 +1,11 @@
+# Compilación de Maven
+target/
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+# Variables locales
+.env
